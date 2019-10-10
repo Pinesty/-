@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.example.serialporttest.serialport.Modbus;
 import com.example.serialporttest.serialport.PortCommand;
+import com.example.serialporttest.serialport.RFIDConn;
 import com.example.serialporttest.serialport.SerialPortUtil;
 import com.example.serialporttest.serialport.PortCommunication;
 
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private Button lockbtn1_10;
     private TextView tvtext;
     private PortCommunication pcomm;
+    private RFIDConn rfidConn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         lockbtn3 = findViewById(R.id.lockbtn3);
         lockbtn1_10 = findViewById(R.id.btn1_10);
         pcomm = new PortCommunication();
+        rfidConn = new RFIDConn();
 
         try{
             Log.i(SerialPortUtil.TAG,"Starting serial port...");
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             SerialPortUtil.startSerialPort();
 //            SerialPortUtil.startReceiveData();
             pcomm.startCommunicate();
+            rfidConn.start();
         }
         catch (Exception e){
             Log.e(SerialPortUtil.TAG,"fail to initialize serial port:"+e.toString());
@@ -95,13 +99,7 @@ public class MainActivity extends AppCompatActivity {
         lockbtn1_10.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String msg;
-                for(int i=1;i<=9;i++) {
-                    msg = Modbus.generateProtocol(new PortCommand(ADDR01, "00", "0" + i));
-                    pcomm.getWt().pushData(msg);
-                }
-                msg = Modbus.generateProtocol(new PortCommand(ADDR01, "00", "0A"));
-                pcomm.getWt().pushData(msg);
+                rfidConn.realTimeInventory();
             }
         });
     }

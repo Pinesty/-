@@ -87,14 +87,31 @@ public class PortCommunication {
         }
     }
     public class ReadThread extends Thread{
+        private BlockingDeque<String> dataQueue;
+        public ReadThread(){
+            dataQueue = new LinkedBlockingDeque<String>();
+        }
+        public void pushData(String data){
+            dataQueue.push(data);
+        }
+        public void cleanQueue(){
+            dataQueue.clear();
+        }
+        public boolean parsingData(String data){
+            if(true)//如果读到末尾则返回成功
+                return true;
+            return false;
+        }
         @Override
         public void run(){
             while(isRunning){
                 try{
                     LockSupport.park();
                     Log.i(TAG,"Waiting for response...");
-                    while(needResponse&&SerialPortUtil.getInputStream().available()<=0)
-                        Thread.sleep(200);
+                    while(needResponse&&SerialPortUtil.getInputStream().available()<=0){
+                        Thread.sleep(100);
+                        //Log.i(TAG,"Waiting...");
+                    }
                     if(needResponse){
                         String data = SerialPortUtil.getInputString();
                         if(data.length()>0){ //收到正确的回应后
